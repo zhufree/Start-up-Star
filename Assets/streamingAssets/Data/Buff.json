@@ -1,0 +1,56 @@
+{"buffList": [
+    {
+        "id": 1,
+        "name": "心虚",
+        "type": "buff",
+        "desc": "每回合结束压力+5%，可以用[resist]抵消"
+    },
+    {
+        "id": 2,
+        "name": "同理心",
+        "type": "buff",
+        "desc": "使手牌提升[heart]增加25%"
+    },
+    {
+        "id": 3,
+        "name": "恐惧",
+        "type": "buff",
+        "desc": "使当前回合打出的任意3张手牌不消耗[round]"
+    },
+    {
+        "id": 4,
+        "name": "好奇",
+        "type": "buff",
+        "desc": "每回合结束后提升6点[heart]"
+    },
+    {
+        "id": 5,
+        "name": "装死",
+        "type": "debuff",
+        "desc": "使得打出手牌提升[heart]的效果降低25%"
+    },
+    {
+        "id": 6,
+        "name": "自信",
+        "type": "buff",
+        "desc": "每回合获取2点[resist]"
+    },
+    {
+        "id": 7,
+        "name": "猜疑",
+        "type": "debuff",
+        "desc": "每回合结束获得2点[resist]。敌方若开局携带则为无限回合。"
+    },
+    {
+        "id": 8,
+        "name": "设局",
+        "type": "buff",
+        "desc": "增益特定卡牌。如伊琳娜的“运筹帷幄”，白逸的“谄媚”，菲的“互惠互利”"
+    },
+    {
+        "id": 9,
+        "name": "急迫",
+        "type": "debuff",
+        "desc": "此后每回合[round]额外-1。敌方若开局携带则为无限回合。"
+    }
+]}

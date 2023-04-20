@@ -1,0 +1,118 @@
+{
+  "npcList": [
+  {
+    "id": 1,
+    "name": "白逸",
+    "type": "MC",
+    "description": "主角。白记实业老板，战斗力极强的狂厄级禁闭者。平时吊儿郎当的，完全不知道为什么没有从商经验的她会选择在辛迪加创业。"
+  },
+  {
+    "id": 2,
+    "name": "蔻蔻",
+    "type": "special", 
+    "description": "偏向防御，增加🛡抵抗在抬价系统中的压力值提升。"
+  },
+  {
+    "id": 3,
+    "name": "澈",
+    "type": "special", 
+    "description": "基础卡。偏向辅助，额外抽牌。"
+  },
+  {
+    "id": 4,
+    "name": "卓娅",
+    "type": "special", 
+    "description": "偏向全能，泛用性强。"
+  },
+  {
+    "id": 5,
+    "name": "伊琳娜",
+    "type": "special", 
+    "description": "偏向连锁，能迅速提高顾客的兴趣。"
+  },
+  {
+    "id": 6,
+    "name": "菲",
+    "type": "special", 
+    "description": "偏向连锁，能长线获得顾客的兴趣。"
+  },
+  {
+    "id": 7,
+    "name": "MBCC局长（女）",
+    "type": "special", 
+    "description": "偏向莽，多为自己施加DEBUFF换取各类效果。"
+  },
+  {
+    "id": 8,
+    "name": "黑帮喽啰",
+    "type": "common",
+    "description": "辛迪加最常见的人，顾客NPC"
+  },
+
+{
+    "id": 9,
+    "name": "黑帮马仔",
+    "type": "common",
+    "description": "辛迪加最常见的人，顾客NPC"
+  },
+  {
+    "id": 10,
+    "name": "流民寨百姓",
+    "type": "common",
+    "description": "辛迪加最常见的人，顾客NPC"
+  },
+  {
+    "id": 11,
+    "name": "第九机关特务",
+    "type": "common",
+    "description": "兰利的传话筒，顾客NPC（多为派发订单，事件触发）"
+  },
+  {
+    "id": 12,
+    "name": "奎恩集团雇员",
+    "type": "common",
+    "description": "伊琳娜的传话筒，顾客NPC（多为派发订单，事件触发）"
+  },
+
+{
+    "id": 13,
+    "name": "赫罗",
+    "type": "common",
+    "description": "军团成员，卓娅的心腹。顾客NPC",
+    "gift": "黑暗牛奶"
+  },
+  {
+    "id": 14,
+    "name": "露利艾卡",
+    "type": "common",
+    "description": "流浪儿成员，拥有强运异能的禁闭者。顾客NPC",
+    "gift": "幸运四叶草"
+  },
+  {
+    "id": 15,
+    "name": "莓丝",
+    "type": "common",
+    "description": "用恶意铸造实体武器、道具的工匠型禁闭者。顾客NPC",
+    "unlock": "诡异的老虎机",
+    "gift": "梦露"
+  },
+{
+    "id": 16,
+    "name": "兰利",
+    "type": "special",
+    "description": "第九机关的首脑，人称银蜘蛛（被蔻蔻和澈称呼为女蜘蛛）总之是个大BOSS，知道你的过去并监视着你在辛迪加的一举一动。如果她亲自光临白记会让你的压力值剧增。",
+    "gift": "银色子弹"
+  },
+  {
+    "id": 17,
+    "name": "神秘房东",
+    "type": "special",
+    "description": "只在终端对话里出现的神秘人，声音经过特殊处理，无法识别具体身份。会在特定时间节点来收缴房租，让你压力很大。拖欠钱数目过高会导致你的账号被冻结，游戏结束（什么人啊权限那么大？！）"
+  },
+  {
+    "id": 18,
+    "name": "帕尔马雨衣男",
+    "type": "special",
+    "description": "你老东家的下属，夜间来白记的谜语人。对你没什么威胁，但是看见了就心烦意乱，会让你的压力值剧增。"
+  }
+]}

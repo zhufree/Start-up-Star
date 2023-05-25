@@ -97,11 +97,16 @@ public class ConstantManager : MonoBehaviour
         string buffJsonString = File.ReadAllText(buffJsonPath);
         buffData = JsonUtility.FromJson<BuffData>(buffJsonString);
         allBuff = buffData.buffList;
-        Debug.Log(allBuff);
         allDebuff = allBuff.FindAll(buff => buff.type == "debuff");
-        Debug.Log(allDebuff);
     }
 
+    public Buff getBuffByID(int ID) {
+        if (allBuff != null)
+        {
+            return allBuff.Find(buff => buff.id == ID);
+        }
+        return null;
+    }
 
     // Function to return a random NPC with type "common"
     public NPC GetRandomCommonNPC()

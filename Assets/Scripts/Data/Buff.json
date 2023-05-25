@@ -3,7 +3,7 @@
     {
         "id": 1,
         "name": "心虚",
-        "type": "buff",
+        "type": "debuff",
         "desc": "每回合结束压力+5%，可以用[resist]抵消"
     },
     {

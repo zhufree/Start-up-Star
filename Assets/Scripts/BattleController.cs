@@ -11,11 +11,21 @@ public class BattleController : MonoBehaviour
     GameObject NPCObject; //当前来买东西的NPC Object
     public GameObject cardContainer; // canvas下的bag game object UI
     public GameObject slotLayout; // 放物品的网格game Object UI
-    public TMP_Text BuyerInfo;
-    public TMP_Text ItemInfo;
-    public TMP_Text StatusInfo;
-    public CardObject cardPrefab; // 与Prefab对应的数据结构 DATA
-    public List<CardObject> cardSlotList = new List<CardObject>();
+    public TMP_Text tCustomName;
+    public TMP_Text tItemName;
+    public TMP_Text tRound;
+    public TMP_Text tStatus;
+    public TMP_Text tPatienceLevel;
+    public TMP_Text tCurrentPrice;
+    public TMP_Text tCustomHeart;
+    public TMP_Text tNPCResist;
+    public TMP_Text tCurrentCard;
+    public TMP_Text tPlayerResist;
+    public TMP_Text tNPCBuff;
+    public TMP_Text tPlayerBuff;
+    public TMP_Text tPlayerPressure;
+    public CardSlot cardPrefab; // 与Prefab对应的数据结构 DATA
+    public List<CardSlot> cardSlotList = new List<CardSlot>();
 
     NPC currentNPC; //当前来买东西的NPC对象，随机产生，和GameObject绑定
     Item itemToBuy = new Item("testItem", "test", 30, "null"); // 当前要卖的货物，后面改成选择
@@ -58,28 +68,56 @@ public class BattleController : MonoBehaviour
     }
     private void Start()
     {
-        allDebuffIdList = ConstantManager.Instance.allDebuff.Select(buff => buff.id).ToList();
-        Debug.Log(allDebuffIdList);
-        RandomNPC(); // 随机NPC
-        remainCards = new List<Card>(ConstantManager.Instance.playerCardDeck); // 初始化卡组
-        itemPrice = itemToBuy.price; // 初始化价格
-        GetInitCards(); // 抽卡
+        StartCoroutine(Init());
     }
     private void Update()
     {
+        refreshStatus();
+    }
+
+    private IEnumerator Init() {
+        tStatus.text = "初始化数据...";
+        allDebuffIdList = ConstantManager.Instance.allDebuff.Select(buff => buff.id).ToList();
+        yield return new WaitForSeconds(1f);
+        RandomNPC(); // 随机NPC
+        remainCards = new List<Card>(ConstantManager.Instance.playerCardDeck); // 初始化卡组
+        itemPrice = itemToBuy.price; // 初始化价格
+        yield return new WaitForSeconds(1f);
+        tStatus.text = "初始抽卡...";
+        GetInitCards();
+        tStatus.text = "玩家回合，请出卡";
+    }
+
+    private void refreshStatus() {
+        tCurrentPrice.text = $"涨价百分比：{priceIncrease}%，物品当前价格为{itemPrice}";
+        tRound.text = $"第{currentRound}回合";
+        tPatienceLevel.text = $"顾客耐心值/剩余回合数为{patienceLevel}";
+        tCustomHeart.text = $"心心数：{heartCount}";
+        tPlayerResist.text = $"玩家防御值：{playerResist}";
+        tNPCResist.text = $"顾客防御值：{playerResist}";
+        tPlayerPressure.text = $"玩家压力值：{pressure}";
+        tNPCBuff.text = "NPCBuff：";
+        tPlayerBuff.text = "玩家Buff：";
+        foreach (var id in NPCBuffDict.Keys.ToArray())
+        {
+            tNPCBuff.text += ConstantManager.Instance.getBuffByID(id).name + $"({NPCBuffDict[id]-1}),";
+        }
+        foreach (var id in playerBuffDict.Keys.ToArray())
+        {
+            tPlayerBuff.text += ConstantManager.Instance.getBuffByID(id).name + $"({playerBuffDict[id]-1}),";
+        }
     }
 
     private void RandomNPC() {
-        Debug.Log("RandomNPC()");
         List<NPC> allCommonNPC = ConstantManager.Instance.allCommonNPC;
         currentNPC = allCommonNPC[Random.Range(0, allCommonNPC.Count)];
-        BuyerInfo.text = $"当前顾客是：{currentNPC.name}";
-        ItemInfo.text = $"当前出售的物品是：{itemToBuy.name}，初始价格是{itemToBuy.price}";
+        tStatus.text = "随机生成顾客...";
+        tCustomName.text = $"当前顾客是：{currentNPC.name}";
+        tItemName.text = $"当前出售的物品是：{itemToBuy.name}，初始价格是{itemToBuy.price}";
     }
 
     private void GetInitCards() {
         currentRound += 1;
-        StatusInfo.text = $"当前状态：第{currentRound}回合抽卡，顾客耐心值/剩余回合数为{patienceLevel}，物品当前价格为{itemPrice}";
         // Get three or four random cards from the player's card deck and add them to the cardsInHand list
         for (int i = 0; i < 3 || i < 4; i++) {
             if (remainCards.Count == 0) {
@@ -89,8 +127,13 @@ public class BattleController : MonoBehaviour
             cardsInHand.Add(remainCards[randomIndex]);
             remainCards.RemoveAt(randomIndex);
         }
+        refreshCard();
+    }
+
+    private void refreshCard() {
+        cardSlotList.Clear();
         foreach (Card card in cardsInHand) {
-            CardObject newCard = Instantiate(cardPrefab, slotLayout.transform.position, 
+            CardSlot newCard = Instantiate(cardPrefab, slotLayout.transform.position, 
                 Quaternion.identity);
             newCard.SetItem(card);
             newCard.gameObject.transform.SetParent(slotLayout.transform);
@@ -99,11 +142,19 @@ public class BattleController : MonoBehaviour
     }
 
     private void GetOneMoreCard() {
+        Debug.Log("GetOneMoreCard()");
+        tStatus.text = "抽卡...";
         if (remainCards.Count == 0) {
             return;
         }
         int randomIndex = Random.Range(0, remainCards.Count);
-        cardsInHand.Add(remainCards[randomIndex]);
+        Card newCard = remainCards[randomIndex];
+        cardsInHand.Add(newCard);
+        CardSlot newCardSlot = Instantiate(cardPrefab, slotLayout.transform.position, 
+                Quaternion.identity);
+        newCardSlot.SetItem(newCard);
+        newCardSlot.gameObject.transform.SetParent(slotLayout.transform);
+        cardSlotList.Add(newCardSlot);
         remainCards.RemoveAt(randomIndex);
     }
 
@@ -111,35 +162,82 @@ public class BattleController : MonoBehaviour
 
     }
 
-    public void UseCard(CardObject cardSlot) {
-        Card currentCard = cardSlot.cardItem;
-        StatusInfo.text = $"当前状态：第{currentRound}回合打出卡牌[{currentCard.name}]，顾客耐心值/剩余回合数为{patienceLevel}，" +
-            $"心心数：{heartCount},涨价百分比：{priceIncrease}%,物品当前价格为{itemPrice}";
-        
-        if (patienceLevel < 0) {
-            // round end
-            StatusInfo.text = $"当前状态：回合结束";
-            return;
+    public void ResetCardSelectStatus() {
+        foreach (CardSlot slot in cardSlotList) {
+            slot.bg.enabled = false;
         }
+    }
+
+    bool finishFlag = false;
+    public void UseCard(CardSlot cardSlot) {
+        Card currentCard = cardSlot.cardItem;
+        tCurrentCard.text = $"打出卡牌[{currentCard.name}]";
         cardSlotList.Remove(cardSlot);
         Destroy(cardSlot.gameObject);
+        Debug.Log("计算用户兴趣");
         patienceLevel -= currentCard.round;
+        if (patienceLevel < 0) {
+            // round end
+            FinishDeal();
+        }
         heartCount += currentCard.heart;
         playerResist += currentCard.resist;
-        StatusInfo.text = $"当前状态：第{13-patienceLevel}回合打出卡牌[{currentCard.name}]，顾客耐心值/剩余回合数为{patienceLevel}，" +
-                $"心心数：{heartCount}/{currentHeartGoal},涨价百分比：{priceIncrease}%,物品当前价格为{itemPrice}";
         CaculateHeart();
-        CardEffect(currentCard);
-        
-        foreach (int buff in playerBuffDict.Keys) {
-            BuffEffect(0, buff);
+        Debug.Log("计算卡片效果");
+        CardEffect(currentCard); // 卡片效果有可能结束交易
+        if (!finishFlag) {
+            Debug.Log("计算BUFF效果");
+            int[] playerBuffkeysArray = playerBuffDict.Keys.ToArray();
+            int[] NPCBuffkeysArray = NPCBuffDict.Keys.ToArray();
+            Debug.Log(playerBuffDict);
+            foreach (int key in playerBuffkeysArray)
+            {
+                BuffEffect(0, key);
+            }
+            foreach (int key in NPCBuffkeysArray)
+            {
+                BuffEffect(1, key);
+            }
+            usedCardCount += 1;
+        } else {
+            FinishDeal();
         }
-        foreach (int buff in NPCBuffDict.Keys) {
-            BuffEffect(1, buff);
+    }
+
+    public void FinishDeal() {
+        if (finishFlag) {
+            tStatus.text = $"交易结束，获得{itemPrice}";
+        } else {
+            tStatus.text = $"顾客耐心值为{patienceLevel}，交易失败";
         }
-        usedCardCount += 1;
-        GetOneMoreCard();
+        cardsInHand.Clear();
+        refreshCard();
+    }
+
+    public void FinishRound() {
+        tStatus.text = "回合结束";
         currentRound += 1;
+        usedCardCount = 0;
+        // buff持续回合数-1
+        // target 0 player, 1 NPC
+        int[] playerBuffkeysArray = playerBuffDict.Keys.ToArray();
+        int[] NPCBuffkeysArray = NPCBuffDict.Keys.ToArray();
+        foreach (int key in playerBuffkeysArray) {
+            if (playerBuffDict[key] > 1) {
+                playerBuffDict[key] -= 1;
+            } else {
+                playerBuffDict.Remove(key);
+            }
+        }
+        foreach (int key in NPCBuffkeysArray) {
+            if (NPCBuffDict[key] > 1) {
+                NPCBuffDict[key] -= 1;
+            } else {
+                NPCBuffDict.Remove(key);
+            }
+        }
+        
+        GetOneMoreCard();
     }
     
     private void CaculateHeart() {
@@ -180,16 +278,19 @@ public class BattleController : MonoBehaviour
             currentHeartGoal = 99;
         }
         itemPrice = itemToBuy.price * (1+ priceIncrease/100f);
-        StatusInfo.text = $"当前状态：第{13-patienceLevel}回合，顾客耐心值/剩余回合数为{patienceLevel}，" +
-                $"心心数：{heartCount}/{currentHeartGoal},涨价百分比：{priceIncrease}%,物品当前价格为{itemPrice}";
     }
+
+    int playerAddBuffId = -1;
+    int NPCAddBuffId = -1;
+    int playerDeleteBuffId = -1;
+    int NPCDeleteBuffId = -1;
 
     private void CardEffect(Card card) {
         // 卡片效果，施加buff等
         switch (card.id) {
             case 1:
                 // 花招：自身获得3回合DEBUFF“心虚”（每回合结束压力+5%，可以用[resist]抵消）
-                playerBuffDict.Add(1, 3);
+                playerBuffDict.Add(1, 3+1);
                 break;
             case 2:
                 // 谄媚"：若顾客存在“设局”BUFF则额外提升3点[heart]
@@ -199,7 +300,7 @@ public class BattleController : MonoBehaviour
                 break;
             case 3:
                 // 收尾工作：强制结束交易
-                // TODO
+                finishFlag = true;
                 break;
             case 4:
                 // 及时行乐：根据当前回合已打出的手牌数量，每张提升7点[heart]
@@ -207,10 +308,10 @@ public class BattleController : MonoBehaviour
                 break;
             case 5:
                 // 同舟共济：获得1回合“同理心”BUFF
-                playerBuffDict.Add(2, 1);
+                playerBuffDict.Add(2, 1+1);
                 break;
             case 6:
-                // 防御姿态：开场额外获取2点[resist]
+                // 防御姿态：获取2点[resist]防备，开场额外获取2点[resist]
                 if (currentRound == 0) {
                     playerResist += 2;
                 }
@@ -253,11 +354,13 @@ public class BattleController : MonoBehaviour
                 break;
             case 14:
                 // 压迫感:对顾客施加1回合“恐惧”BUFF
-                NPCBuffDict.Add(3, 1);
+                NPCBuffDict.Add(3, 1+1);
                 break;
             case 15:
                 // 一往无前:若此卡牌为最后1张手牌则额外提升4点[heart]并强制结束交易
-                // TODO
+                if (cardsInHand.Count == 1) {
+                    finishFlag = true;
+                }
                 break;
             case 16:
                 // 设局:对顾客施加无限回合的\"设局\"BUFF
@@ -278,20 +381,23 @@ public class BattleController : MonoBehaviour
                 break;
             case 19:
                 // 后翼弃兵，指定丢弃1张手牌并提升3点[heart]，若使用时手牌数≤1则额外提升9点[heart]
-                // TODO
+                if (cardsInHand.Count <= 1) {
+                    heartCount += 9;
+                }
+                // todo drop card
                 break;
             case 20:
                 // 长线运营：自身获得3回合“同理心”BUFF,若开场使用则效果延长至4回合
                 if (patienceLevel == 0) {
-                    playerBuffDict.Add(2, 3);
+                    playerBuffDict.Add(2, 3+1);
                 } else {
-                    playerBuffDict.Add(2, 4);
+                    playerBuffDict.Add(2, 4+1);
                 }
                 break;
             case 21:
                 // 以小钓大:指定丢弃1张手牌，对顾客施加3回合“好奇”BUFF
                 // TODO
-                NPCBuffDict.Add(4, 3);
+                NPCBuffDict.Add(4, 3+1);
                 break;
             case 22:
                 // 互惠互利:清除顾客所有BUFF提升9点[heart]若顾客存在“设局”BUFF则额外获得3点[heart]
@@ -305,7 +411,7 @@ public class BattleController : MonoBehaviour
                 // 爱要不要：清点顾客及自身的BUFF+DEBUFF数量，每个提升3点[heart]并强制结束交易
                 // Count the number of items in playerBuffDict and NPCBuffDict, then multiply the total count by 3
                 heartCount += (playerBuffDict.Count + NPCBuffDict.Count) * 3;
-                // TODO 强制结束交易
+                finishFlag = true;
                 break;
             case 24:
                 // 孤注一掷:获得无限回合“急迫”DEBUFF
@@ -315,13 +421,13 @@ public class BattleController : MonoBehaviour
                 // 虚张声势:提升3点[round]，并自身获得2回合DEBUFF“心虚”（每回合结束后压力值+5%，可以用[resist]抵消），
                 // 顾客获得2回合“猜疑”DEBUFF（每回合结束获得2点[resist]
                 patienceLevel += 3;
-                playerBuffDict.Add(1, 2);
-                NPCBuffDict.Add(7, 2);
+                playerBuffDict.Add(1, 2+1);
+                NPCBuffDict.Add(7, 2+1);
                 break;
             case 26:
                 // 假死:提升2点[round]，自身获取2回合“装死”DEBUFF（无法添加任意BUFF）
                 patienceLevel += 2;
-                playerBuffDict.Add(5, 2);
+                playerBuffDict.Add(5, 2+1);
                 break;
             case 27:
                 // 狂厄大怨种:自身每个DEBUFF可以提升9点[heart]并强制结束交易
@@ -330,23 +436,23 @@ public class BattleController : MonoBehaviour
                         heartCount += 9;
                     }
                 }
-                // TODO
+                finishFlag = true;
                 break;
             case 28:
                 // 认证鉴定:自身获得1回合“自信”BUFF,并使商品溢价固定提升2%
-                playerBuffDict.Add(6, 1);
+                playerBuffDict.Add(6, 1+1);
                 priceIncrease += 2;
                 break;
             case 29:
                 // 花言巧语:清除顾客所有[resist],对顾客施加2回合“好奇”BUFF
                 NPCResist = 0;
-                NPCBuffDict.Add(4, 2);
+                NPCBuffDict.Add(4, 2+1);
                 break;
             case 30:
                 // 营私戏码:使商品溢价固定提升5%，并使得顾客获得3回合“猜疑”DEBUFF（每回合结束获得2点[resist]）。
                 // 若顾客存在“设局”BUFF则额外提升6[heart]，并清除该BUFF
                 priceIncrease += 5;
-                NPCBuffDict.Add(7, 3);
+                NPCBuffDict.Add(7, 3+1);
                 if (NPCBuffDict.ContainsKey(8)) {
                     heartCount += 6;
                     NPCBuffDict.Remove(8);
@@ -395,7 +501,7 @@ public class BattleController : MonoBehaviour
                 break;
             case 36:
                 // 同理心：自身获得3回合“同理心”BUFF
-                playerBuffDict.Add(2, 3);
+                playerBuffDict.Add(2, 3+1);
                 break;
             case 37:
                 // 平静：移除自身和顾客的“急迫”DEBUFF和“心虚”DEBUFF。使用后清除手牌中所有情绪卡
@@ -409,7 +515,7 @@ public class BattleController : MonoBehaviour
                 // 若顾客存在“恐惧”BUFF则额外提升4点[round]，并清除该BUFF
                 NPCResist = 0;
                 NPCBuffDict.Remove(7);
-                playerBuffDict.Add(2, 1);
+                playerBuffDict.Add(2, 1+1);
                 if (NPCBuffDict.ContainsKey(3)) {
                     patienceLevel += 4;
                     NPCBuffDict.Remove(3);
@@ -483,14 +589,6 @@ public class BattleController : MonoBehaviour
                 break;
         }
 
-        // buff持续回合数-1
-        // target 0 player, 1 NPC
-        if (target == 0) {
-            if (playerBuffDict[buff] > 1) {
-                playerBuffDict[buff] -= 1;
-            } else {
-                playerBuffDict.Remove(buff);
-            }
-        }
+        
     }
 }

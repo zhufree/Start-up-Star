@@ -30,7 +30,11 @@ public class CardSlot : MonoBehaviour
     public void ItemOnClicked() {
         BattleController.Instance.ResetCardSelectStatus();
         if (selected) {
-            BattleController.Instance.UseCard(this);
+            if (BattleController.Instance.dropCardStatus) {
+                BattleController.Instance.DropCard(this.cardItem);
+            } else {
+                BattleController.Instance.UseCard(this);
+            }
         } else {
             bg.enabled = true;
             selected = true;

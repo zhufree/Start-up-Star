@@ -24,6 +24,6 @@ public class AutoController: MonoBehaviour
     {
         // 实现存档逻辑
         SaveManager.SaveCardDeck(ConstantManager.Instance.playerCardDeck);
-        Debug.Log("Game saved!");
+        // Debug.Log("Game saved!");
     }
 }
